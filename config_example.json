@@ -1,0 +1,25 @@
+{
+	"token":"DISCORD_TOKEN",
+	"repos":[
+		{
+			"name": "HearthSim/Hearthstone-Deck-Tracker",
+			"prefixes": ["hdt"],
+			"channels": ["hdt"]
+		},
+		{
+			"name": "HearthSim/HSReplaynet",
+			"prefixes": ["hsreplay", "hsr"],
+			"channels": []
+		},
+		{
+			"name": "HearthSim/Joust",
+			"prefixes": ["joust"],
+			"channels": []
+		},
+		{
+			"name": "HearthSim/HSTracker",
+			"prefixes": ["hstracker", "hst"],
+			"channels": ["hstracker"]
+		}
+	]
+}
