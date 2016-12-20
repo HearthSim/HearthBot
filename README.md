@@ -1,0 +1,2 @@
+# hearthbot
+Discord bot
