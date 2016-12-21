@@ -20,6 +20,11 @@
 			"name": "HearthSim/HSTracker",
 			"prefixes": ["hstracker", "hst"],
 			"channels": ["hstracker"]
+		},
+		{
+			"name": "HearthSim/hs-bugs",
+			"prefixes": ["bugs", "bug"],
+			"channels": []
 		}
 	]
 }
