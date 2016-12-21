@@ -5,11 +5,17 @@ from hearthstone import cardxml
 db, _ = cardxml.load()
 
 
-class CardHandler():	
+class CardHandler():
+	def __init__(self):
+		self.db = {}
+		for key in db.keys():
+			self.db[key.lower()] = db[key]
+		
 	def handle(self, input, max_response, collectible = None):
 		print("input:", input)
+		input = input.lower()
 		try:
-			card = db[input];
+			card = self.db[input]
 			if card is not None:
 				return self.stringify_card(card)
 		except Exception as e:
@@ -26,7 +32,7 @@ class CardHandler():
 			cards = []
 			for card in db.values():
 				if collectible is None or collectible == card.collectible:
-					if input.lower() in card.name.lower():
+					if input in card.name.lower():
 						cards.append(card)
 			num_cards = len(cards)
 
