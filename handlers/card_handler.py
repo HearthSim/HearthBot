@@ -27,11 +27,15 @@ class CardHandler():
 			for card in db.values():
 				if input.lower() in card.name.lower():
 					cards.append(card)
+			num_cards = len(cards)
 
+			if num_cards == 0:
+				return "Card not found"
+			if num_cards == 1:
+				return self.stringify_card(cards[0], 0, 0)				
 			if index >= 0:
-				return self.stringify_card(cards[index-1], index, len(cards))
-
-			return "\n".join(self.stringify_card(cards[i], i + 1, len(cards)) for i in range(0, 2))
+				return self.stringify_card(cards[index-1], index, num_cards)
+			return "\n".join(self.stringify_card(cards[i], i + 1, num_cards) for i in range(0, 2))
 		except Exception as e:
 			print(e)
 			pass
