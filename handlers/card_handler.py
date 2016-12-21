@@ -10,7 +10,8 @@ class CardHandler():
 		self.db = {}
 		for key in db.keys():
 			self.db[key.lower()] = db[key]
-		
+
+
 	def handle(self, input, max_response, collectible = None):
 		print("input:", input)
 		input = input.lower()
@@ -22,7 +23,7 @@ class CardHandler():
 			print(e)
 			pass
 		
-		try:	
+		try:
 			index = -1
 			match = re.match("^(.+?)(\d+)$", input)
 			if match is not None:
@@ -39,7 +40,7 @@ class CardHandler():
 			if num_cards == 0:
 				return "Card not found"
 			if num_cards == 1:
-				return self.stringify_card(cards[0], 0, 0)				
+				return self.stringify_card(cards[0], 0, 0)
 			if index >= 0:
 				return self.stringify_card(cards[index-1], index, num_cards)
 			
@@ -51,6 +52,7 @@ class CardHandler():
 			print(e)
 			pass
 		return "Card not found"
+
 
 	def stringify_card(self, card, index = 0, total = 0):
 		health = card.durability if card.type == CardType.WEAPON else card.health
