@@ -29,22 +29,18 @@ async def on_message(message):
 	if message.author.id == client.user.id:
 		return
 	if message.content.startswith(CMD_CARD):
-		max_reponse = 10 if message.channel.is_private else 2
-		response = card_handler.handle(message.content[len(CMD_CARD):], max_reponse)
-		print("[%s]" % (message.channel), message.content)
-		print("Reponse:", response)
+		response = card_handler.handle(message.content[len(CMD_CARD):], max_reponse(message))
+		log(message, response)
 		await client.send_message(message.channel, response);
 		return
 	if message.content.startswith(CMD_TAG):
 		response = enum_handler.handle("GameTag " + message.content[len(CMD_TAG):])
-		print("[%s]" % (message.channel), message.content)
-		print("Reponse:", response)
+		log(message, response)
 		await client.send_message(message.channel, response);
 		return
 	if message.content.startswith(CMD_ENUM):
 		response = enum_handler.handle(message.content[len(CMD_ENUM):])
-		print("[%s]" % (message.channel), message.content)
-		print("Reponse:", response)
+		log(message, response)
 		await client.send_message(message.channel, response);
 		return	
 		
@@ -59,5 +55,11 @@ async def on_message(message):
 		if response is not None:
 			await client.send_message(message.channel, response)
 
+def max_response(message):
+	return 10 if message.channel.is_private else 2
+
+def log(message, response):
+	print("[%s]" % (message.channel), message.content)
+	print("Reponse:", response)
 
 client.run(config["token"])
