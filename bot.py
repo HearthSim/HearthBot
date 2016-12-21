@@ -50,7 +50,7 @@ async def on_message(message):
 		await client.send_message(message.channel, response);
 		return	
 		
-	matches = re.findall("(\w+)?#(\d+)", message.content)
+	matches = re.findall("(?<!<)(\w+)?#(\d+)", message.content)
 	if len(matches):
 		print("[%s]" % (message.channel), message.content)		
 	for match in matches:
