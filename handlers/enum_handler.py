@@ -10,7 +10,7 @@ class EnumHandler():
 			return "Invalid search term. Use '!enum [ENUM_NAME] [NAME/VALUE]'"
 		
 		for enum_class in inspect.getmembers(enums, inspect.isclass):
-			if enum_class[0] == parts[0]:
+			if enum_class[0].lower() == parts[0].lower() or enum_class[1].__doc__.lower() == parts[0].lower():
 				targetEnum = enum_class[1]
 				break
 		if targetEnum is None:
