@@ -22,14 +22,18 @@ async def on_message(message):
 		return
 	if message.content.startswith("!card "):
 		response = card_handler.handle(message.content[6:])
+		print("[%s]" % (message.channel), message.content)
+		print("Reponse:", response)
 		await client.send_message(message.channel, response);
 		return
 	matches = re.findall("(\w+)?#(\d+)", message.content)
 	if len(matches):
+		print("[%s]" % (message.channel), message.content)		
 	for match in matches:
 		prefix = match[0]
 		issue = match[1]
 		response = issue_handler.handle(message.channel.name, prefix, issue)
+		print("Reponse:", response)
 		if response is not None:
 			await client.send_message(message.channel, response)
 
