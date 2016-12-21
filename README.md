@@ -3,7 +3,7 @@ Hearthstone/Github bot for Discord
 
 
 ## Available commands:
-- `!card [CardId|partial_name]`
+- `!card [CardId|partial_name]` (alternatively use `cardc` or `cardn` for collectible/non-collectible cards only)
 - `!enum [EnumName] [partial_name|value]`
 - `!tag [partial_name|value]` (equivalent to `!enum GameTag`)
 
