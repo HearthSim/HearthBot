@@ -4,6 +4,13 @@ import asyncio
 import json
 from handlers.issue_handler import IssueHandler
 from handlers.card_handler import CardHandler
+from handlers.enum_handler import EnumHandler
+
+
+CMD_CARD = "!card "
+CMD_TAG = "!tag "
+CMD_ENUM = "!enum "
+
 
 with open('config.json', 'r') as f:
     config = json.load(f)
@@ -11,6 +18,7 @@ with open('config.json', 'r') as f:
 client = discord.Client()
 issue_handler = IssueHandler(config["repos"])
 card_handler = CardHandler()
+enum_handler = EnumHandler()
 
 @client.event
 async def on_ready():
@@ -20,12 +28,25 @@ async def on_ready():
 async def on_message(message):
 	if message.author.id == client.user.id:
 		return
-	if message.content.startswith("!card "):
-		response = card_handler.handle(message.content[6:])
+	if message.content.startswith(CMD_CARD):
+		response = card_handler.handle(message.content[len(CMD_CARD):])
 		print("[%s]" % (message.channel), message.content)
 		print("Reponse:", response)
 		await client.send_message(message.channel, response);
 		return
+	if message.content.startswith(CMD_TAG):
+		response = enum_handler.handle("GameTag " + message.content[len(CMD_TAG):])
+		print("[%s]" % (message.channel), message.content)
+		print("Reponse:", response)
+		await client.send_message(message.channel, response);
+		return
+	if message.content.startswith(CMD_ENUM):
+		response = enum_handler.handle(message.content[len(CMD_ENUM):])
+		print("[%s]" % (message.channel), message.content)
+		print("Reponse:", response)
+		await client.send_message(message.channel, response);
+		return	
+		
 	matches = re.findall("(\w+)?#(\d+)", message.content)
 	if len(matches):
 		print("[%s]" % (message.channel), message.content)		
