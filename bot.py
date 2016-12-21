@@ -57,7 +57,7 @@ async def on_message(message):
 		prefix = match[0]
 		issue = match[1]
 		response = issue_handler.handle(message.channel.name, prefix, issue)
-		print("Reponse:", response)
+		print("Reponse:", response.encode("utf-8"))
 		if response is not None:
 			await client.send_message(message.channel, response)
 
@@ -71,6 +71,6 @@ def max_response(message):
 
 def log(message, response):
 	print("[%s]" % (message.channel), message.content)
-	print("Reponse:", response)
+	print("Reponse:", response.encode("utf-8"))
 
 client.run(config["token"])
