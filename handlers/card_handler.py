@@ -6,7 +6,7 @@ db, _ = cardxml.load()
 
 
 class CardHandler():	
-	def handle(self, input):
+	def handle(self, input, max_response):
 		print("input:", input)
 		try:
 			card = db[input];
@@ -35,7 +35,11 @@ class CardHandler():
 				return self.stringify_card(cards[0], 0, 0)				
 			if index >= 0:
 				return self.stringify_card(cards[index-1], index, num_cards)
-			return "\n".join(self.stringify_card(cards[i], i + 1, num_cards) for i in range(0, 2))
+			
+			return "\n".join(
+				self.stringify_card(cards[i], i + 1, num_cards) 
+				for i in range(0, min(max_response, num_cards))
+			)
 		except Exception as e:
 			print(e)
 			pass

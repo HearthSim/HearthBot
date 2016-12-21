@@ -29,7 +29,8 @@ async def on_message(message):
 	if message.author.id == client.user.id:
 		return
 	if message.content.startswith(CMD_CARD):
-		response = card_handler.handle(message.content[len(CMD_CARD):])
+		max_reponse = 10 if message.channel.is_private else 2
+		response = card_handler.handle(message.content[len(CMD_CARD):], max_reponse)
 		print("[%s]" % (message.channel), message.content)
 		print("Reponse:", response)
 		await client.send_message(message.channel, response);
