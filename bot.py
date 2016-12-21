@@ -8,6 +8,8 @@ from handlers.enum_handler import EnumHandler
 
 
 CMD_CARD = "!card "
+CMD_CARD_COLLECTIBLE = "!cardc "
+CMD_CARD_NONCOLLECTIBLE = "!cardn "
 CMD_TAG = "!tag "
 CMD_ENUM = "!enum "
 
@@ -29,9 +31,13 @@ async def on_message(message):
 	if message.author.id == client.user.id:
 		return
 	if message.content.startswith(CMD_CARD):
-		response = card_handler.handle(message.content[len(CMD_CARD):], max_reponse(message))
-		log(message, response)
-		await client.send_message(message.channel, response);
+		await handle_card(message, CMD_CARD);
+		return
+	if message.content.startswith(CMD_CARD_COLLECTIBLE):
+		await handle_card(message, CMD_CARD_COLLECTIBLE, True);
+		return
+	if message.content.startswith(CMD_CARD_NONCOLLECTIBLE):
+		await handle_card(message, CMD_CARD_NONCOLLECTIBLE, False);
 		return
 	if message.content.startswith(CMD_TAG):
 		response = enum_handler.handle("GameTag " + message.content[len(CMD_TAG):])
@@ -54,6 +60,11 @@ async def on_message(message):
 		print("Reponse:", response)
 		if response is not None:
 			await client.send_message(message.channel, response)
+
+async def handle_card(message, cmd, collectible = None):
+		response = card_handler.handle(message.content[len(cmd):], max_response(message), collectible)
+		log(message, response)
+		await client.send_message(message.channel, response);	
 
 def max_response(message):
 	return 10 if message.channel.is_private else 2

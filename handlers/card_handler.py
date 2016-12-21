@@ -6,7 +6,7 @@ db, _ = cardxml.load()
 
 
 class CardHandler():	
-	def handle(self, input, max_response):
+	def handle(self, input, max_response, collectible = None):
 		print("input:", input)
 		try:
 			card = db[input];
@@ -25,8 +25,9 @@ class CardHandler():
 			
 			cards = []
 			for card in db.values():
-				if input.lower() in card.name.lower():
-					cards.append(card)
+				if collectible is None or collectible == card.collectible:
+					if input.lower() in card.name.lower():
+						cards.append(card)
 			num_cards = len(cards)
 
 			if num_cards == 0:
