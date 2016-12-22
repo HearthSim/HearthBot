@@ -85,7 +85,10 @@ class CardHandler():
 
 	def stringify_card(self, card, index=0, total=0, params=None):
 		locale = card.locale
+		tags = ""
 		if params:
+			if params.get("tags", False):
+				tags = "\n%s" % self.get_tags(card)
 			lang = params.get("lang", None)
 			if lang:
 				if len(lang) != 4:
@@ -104,6 +107,10 @@ class CardHandler():
 		text = "\n" + card.loc_text(locale) if len(card.description) else ""
 		flavor = "\n> " + card.loc_flavor(locale) if len(card.flavortext) else ""
 		return (
-			"```Markdown\n[%s][%s][%s]%s%s%s%s\n```"
-			% (card.loc_name(locale), card.id, card.dbf_id, search_index, descr, text, flavor)
+			"```Markdown\n[%s][%s][%s]%s%s%s%s%s\n```"
+			% (card.loc_name(locale), card.id, card.dbf_id, search_index, descr, text, flavor, tags)
 		)
+
+
+	def get_tags(self, card):
+		return ", ".join("%s=%s" % (key.name, card.tags[key]) for key in card.tags.keys())
