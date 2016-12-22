@@ -44,15 +44,23 @@ class CardHandler():
 
 		try:
 			index = -1
-			match = re.match(r"^(.+?)(\d+)$", term)
+			match = re.match(r"^(.+?)\s+(\d+)$", term)
 			if match is not None:
 				term = match.group(1).strip()
 				index = int(match.group(2))
 
+			term_num = None
+			try:
+				term_num = int(term)
+			except Exception:
+				pass
 			cards = []
 			for card in db.values():
 				if collectible is None or collectible == card.collectible:
-					if term in card.name.lower():
+					if (
+						term_num is None and term in card.name.lower()
+						or term_num is not None and term_num == card.dbf_id
+					):
 						cards.append(card)
 			num_cards = len(cards)
 			print("num_cards", num_cards)
