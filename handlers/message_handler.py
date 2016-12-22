@@ -17,13 +17,13 @@ def max_response(message):
 
 
 def log(message, response):
-	print("[%s]" % (message.channel), message.content)
+	print("[%s]" % (message.channel), message.content.encode("utf-8"))
 	print("Reponse:", response.encode("utf-8"))
 
 
 class MessageHandler():
 	def __init__(self, config, client):
-		self.client = client;
+		self.client = client
 		self.issue_handler = IssueHandler(config["repos"])
 		self.card_handler = CardHandler()
 		self.enum_handler = EnumHandler()
@@ -35,7 +35,7 @@ class MessageHandler():
 		if await self.handle_cmd(message):
 			return
 
-		matches = re.findall("(?<!<)(\w+)?#(\d+)", message.content)
+		matches = re.findall(r"(?<!<)(\w+)?#(\d+)", message.content)
 		if len(matches):
 			print("[%s]" % (message.channel), message.content)
 		for match in matches:
@@ -49,28 +49,28 @@ class MessageHandler():
 
 	async def handle_cmd(self, message):
 		if message.content.startswith(CMD_CARD):
-			await self.handle_card(message, CMD_CARD);
+			await self.handle_card(message, CMD_CARD)
 			return True
 		if message.content.startswith(CMD_CARD_COLLECTIBLE):
-			await self.handle_card(message, CMD_CARD_COLLECTIBLE, True);
+			await self.handle_card(message, CMD_CARD_COLLECTIBLE, True)
 			return True
 		if message.content.startswith(CMD_CARD_NONCOLLECTIBLE):
-			await self.handle_card(message, CMD_CARD_NONCOLLECTIBLE, False);
+			await self.handle_card(message, CMD_CARD_NONCOLLECTIBLE, False)
 			return True
 		if message.content.startswith(CMD_TAG):
 			response = self.enum_handler.handle("GameTag " + message.content[len(CMD_TAG):])
 			log(message, response)
-			await self.client.send_message(message.channel, response);
+			await self.client.send_message(message.channel, response)
 			return True
 		if message.content.startswith(CMD_ENUM):
 			response = self.enum_handler.handle(message.content[len(CMD_ENUM):])
 			log(message, response)
-			await self.client.send_message(message.channel, response);
+			await self.client.send_message(message.channel, response)
 			return True
 		return False
 
 
-	async def handle_card(self, message, cmd, collectible = None):
+	async def handle_card(self, message, cmd, collectible=None):
 		response = self.card_handler.handle(message.content[len(cmd):], max_response(message), collectible)
 		log(message, response)
-		await self.client.send_message(message.channel, response);
+		await self.client.send_message(message.channel, response)
