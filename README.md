@@ -3,7 +3,10 @@ Hearthstone/Github bot for Discord
 
 
 ## Available commands:
-- `!card [CardId|partial_name]` (alternatively use `cardc` or `cardn` for collectible/non-collectible cards only)
+- `!card [partial_name|CardID|DbfID]` (alternatively use `cardc` or `cardn` for collectible/non-collectible cards only)
+  - Supported flags:
+    - `--tags`: Lists all tags on the card
+    - `--lang=[enUS|deDE|zhCN|...]`: prints card name, text and flavor text in given language
 - `!enum [EnumName] [partial_name|value]` EnumName support the [class name](https://github.com/HearthSim/python-hearthstone/blob/master/hearthstone/enums.py#L599) as well as the [doc](https://github.com/HearthSim/python-hearthstone/blob/master/hearthstone/enums.py#L600)
 - `!tag [partial_name|value]` (equivalent to `!enum GameTag`)
 
