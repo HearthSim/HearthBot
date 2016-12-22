@@ -104,6 +104,6 @@ class CardHandler():
 		text = "\n" + card.loc_text(locale) if len(card.description) else ""
 		flavor = "\n> " + card.loc_flavor(locale) if len(card.flavortext) else ""
 		return (
-			"```Markdown\n[%s][%s]%s%s%s%s\n```"
-			% (card.loc_name(locale), card.id, search_index, descr, text, flavor)
+			"```Markdown\n[%s][%s][%s]%s%s%s%s\n```"
+			% (card.loc_name(locale), card.id, card.dbf_id, search_index, descr, text, flavor)
 		)
