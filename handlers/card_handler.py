@@ -1,8 +1,27 @@
 import re
-from hearthstone.enums import CardType, Race, Rarity
+from hearthstone.enums import CardType, GameTag, Race, Rarity
 from hearthstone import cardxml
+from hearthstone.cardxml import CardXML
+
+
+ERR_LANG_NOT_FOUND = "Language not found. Supported language keys are e.g. `enUS` or `deDE`"
+
 
 db, _ = cardxml.load()
+
+
+def loc_name(self, locale):
+	return self.strings[GameTag.CARDNAME][locale]
+
+def loc_text(self, locale):
+	return self.strings[GameTag.CARDTEXT_INHAND][locale]
+
+def loc_flavor(self, locale):
+	return self.strings[GameTag.FLAVORTEXT][locale]
+
+CardXML.loc_name = loc_name
+CardXML.loc_text = loc_text
+CardXML.loc_flavor = loc_flavor
 
 
 class CardHandler():
@@ -12,55 +31,79 @@ class CardHandler():
 			self.db[key.lower()] = db[key]
 
 
-	def handle(self, input, max_response, collectible = None):
+	def handle(self, input, max_response, collectible=None):
 		print("input:", input)
-		input = input.lower()
+		term, params = self.parse_input(input)
+
 		try:
-			card = self.db[input]
+			card = self.db[term]
 			if card is not None:
-				return self.stringify_card(card)
+				return self.stringify_card(card, params=params)
 		except Exception as e:
 			print(e)
-			pass
-		
+
 		try:
 			index = -1
-			match = re.match("^(.+?)(\d+)$", input)
+			match = re.match(r"^(.+?)(\d+)$", term)
 			if match is not None:
-				input = match.group(1).strip()
+				term = match.group(1).strip()
 				index = int(match.group(2))
-			
+
 			cards = []
 			for card in db.values():
 				if collectible is None or collectible == card.collectible:
-					if input in card.name.lower():
+					if term in card.name.lower():
 						cards.append(card)
 			num_cards = len(cards)
-
+			print("num_cards", num_cards)
 			if num_cards == 0:
 				return "Card not found"
 			if num_cards == 1:
-				return self.stringify_card(cards[0], 0, 0)
+				return self.stringify_card(cards[0], 0, 0, params)
 			if index >= 0:
-				return self.stringify_card(cards[index-1], index, num_cards)
-			
+				return self.stringify_card(cards[index-1], index, num_cards, params)
+
 			return "\n".join(
-				self.stringify_card(cards[i], i + 1, num_cards) 
+				self.stringify_card(cards[i], i + 1, num_cards, params)
 				for i in range(0, min(max_response, num_cards))
 			)
 		except Exception as e:
 			print(e)
-			pass
 		return "Card not found"
 
 
-	def stringify_card(self, card, index = 0, total = 0):
+	def parse_input(self, input):
+		parts = input.split(" --")
+		term = parts[0].strip().lower()
+		params = {}
+		for part in parts[1:]:
+			p = part.split("=")
+			value = p[1] if len(p) > 1 else True
+			params[p[0].lower()] = value
+		return term, params
+
+
+	def stringify_card(self, card, index=0, total=0, params=None):
+		locale = card.locale
+		if params:
+			lang = params.get("lang", None)
+			if lang:
+				if len(lang) != 4:
+					return ERR_LANG_NOT_FOUND
+				locale = lang[0:2].lower() + lang[2:4].upper()
+				try:
+					card.loc_name(locale)
+				except Exception:
+					return ERR_LANG_NOT_FOUND
 		health = card.durability if card.type == CardType.WEAPON else card.health
 		search_index = " (%s/%s)" % (index, total) if total > 0 else ""
 		stats = " %s/%s" % (card.atk, health) if card.atk + health > 0 else ""
 		race = " (%s)" % (card.race.name.title()) if card.race != Race.INVALID else ""
 		rarity = " %s" % card.rarity.name.title() if card.rarity != Rarity.INVALID else ""
 		descr = "\n[%s Mana,%s%s %s%s]" % (card.cost, stats, rarity, card.type.name.title(), race)
-		text = "\n" + card.description if len(card.description) else ""
-		flavor = "\n> " + card.flavortext if len(card.flavortext) else ""
-		return "```Markdown\n[%s][%s]%s%s%s%s\n```" % (card.name, card.id, search_index, descr, text, flavor)
+		text = "\n" + card.loc_text(locale) if len(card.description) else ""
+		flavor = "\n> " + card.loc_flavor(locale) if len(card.flavortext) else ""
+		return (
+			"```Markdown\n[%s][%s]%s%s%s%s\n```"
+			% (card.loc_name(locale), card.id, search_index, descr, text, flavor)
+		)
