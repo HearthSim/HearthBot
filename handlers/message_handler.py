@@ -16,9 +16,9 @@ def max_response(message):
 	return 10 if message.channel.is_private else 2
 
 
-def log(message, response):
+def log(message, response, edited):
 	print("[%s]" % (message.channel), message.content.encode("utf-8"))
-	print("Reponse:", response.encode("utf-8"))
+	print("Reponse:", response.encode("utf-8"), edited)
 
 
 class MessageHandler():
@@ -47,30 +47,45 @@ class MessageHandler():
 				await self.client.send_message(message.channel, response)
 
 
-	async def handle_cmd(self, message):
+	async def handle_cmd(self, message, my_message=None):
 		if message.content.startswith(CMD_CARD):
-			await self.handle_card(message, CMD_CARD)
+			await self.handle_card(message, CMD_CARD, my_message)
 			return True
 		if message.content.startswith(CMD_CARD_COLLECTIBLE):
-			await self.handle_card(message, CMD_CARD_COLLECTIBLE, True)
+			await self.handle_card(message, CMD_CARD_COLLECTIBLE, my_message, True)
 			return True
 		if message.content.startswith(CMD_CARD_NONCOLLECTIBLE):
-			await self.handle_card(message, CMD_CARD_NONCOLLECTIBLE, False)
+			await self.handle_card(message, CMD_CARD_NONCOLLECTIBLE, my_message, False)
 			return True
 		if message.content.startswith(CMD_TAG):
 			response = self.enum_handler.handle("GameTag " + message.content[len(CMD_TAG):])
-			log(message, response)
-			await self.client.send_message(message.channel, response)
+			await self.respond(message, response, my_message)
 			return True
 		if message.content.startswith(CMD_ENUM):
 			response = self.enum_handler.handle(message.content[len(CMD_ENUM):])
-			log(message, response)
-			await self.client.send_message(message.channel, response)
+			await self.respond(message, response, my_message)
 			return True
 		return False
 
 
-	async def handle_card(self, message, cmd, collectible=None):
+	async def respond(self, message, response, my_message=None):
+		log(message, response, my_message is not None)
+		if my_message is None:
+			my_message = await self.client.send_message(message.channel, response)
+		else:
+			await self.client.edit_message(my_message, response)
+		await self.check_edit(message, my_message)
+
+
+	async def handle_card(self, message, cmd, my_message, collectible=None):
 		response = self.card_handler.handle(message.content[len(cmd):], max_response(message), collectible)
-		log(message, response)
-		await self.client.send_message(message.channel, response)
+		await self.respond(message, response, my_message)
+
+
+	async def check_edit(self, message, sent):
+		original_content = message.content
+		for _ in range(0, 30):
+			if message.content != original_content:
+				await self.handle_cmd(message, sent)
+				return
+			await asyncio.sleep(1)

@@ -1,4 +1,4 @@
-import sys, inspect
+import inspect
 from hearthstone import enums
 
 
@@ -18,7 +18,7 @@ class EnumHandler():
 
 		if len(parts) < 2:
 			return "Invalid number of arguments. Use '!enum [ENUM_NAME] [NAME|VALUE]'"
-		
+
 		enum_classes = inspect.getmembers(enums, inspect.isclass)
 		for enum_class in enum_classes:
 			if enum_class[0].lower() == target_name or enum_class[1].__doc__.lower() == target_name:
@@ -41,13 +41,13 @@ class EnumHandler():
 		if len(ret) > 25:
 			return "More than 25 matches, please be more specific"
 		return ", ".join("`%s = %s`" % (name, value) for (name, value) in ret)
-		
+
 
 	def find_enum(self, enum_classes, target_name):
 		suggestions = []
 		for enum_class in enum_classes:
-			class_name = enum_class[0].lower();
-			if (class_name in target_name or target_name in class_name):
+			class_name = enum_class[0].lower()
+			if class_name in target_name or target_name in class_name:
 				suggestions.append(enum_class[0])
 		response = "Invalid enum name."
 		if len(suggestions):
