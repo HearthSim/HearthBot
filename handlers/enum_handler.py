@@ -28,14 +28,22 @@ class EnumHandler():
 			return self.find_enum(enum_classes, target_name)
 
 		ret = []
-		numValue = None
-		try:
-			numValue = int(parts[1])
-		except Exception as e:
-			pass
+		term_count = len(parts) - 1
+		numValues = [None] * term_count
+		for i in range(0, term_count):
+			try:
+				numValues[i] = int(parts[i + 1].strip())
+			except Exception:
+				pass
 		for enum in targetEnum:
-			if numValue and enum.value == numValue or parts[1].lower() in enum.name.lower():
-				ret.append((enum.name, enum.value))
+			for i in range(0, term_count):
+				term = parts[i + 1].strip().lower()
+				if not len(term):
+					continue
+				if term in enum.name.lower() or numValues[i] and enum.value == numValues[i]:
+					pair = (enum.name, enum.value)
+					if pair not in ret:
+						ret.append(pair)
 		if len(ret) == 0:
 			return "Tag not found"
 		if len(ret) > 25:
