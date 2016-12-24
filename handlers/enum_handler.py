@@ -46,8 +46,8 @@ class EnumHandler():
 						ret.append(pair)
 		if len(ret) == 0:
 			return "Tag not found"
-		if len(ret) > 25:
-			return "More than 25 matches, please be more specific"
+		if len(ret) > 40:
+			return "More than 40 matches, please be more specific"
 		return ", ".join("`%s = %s`" % (name, value) for (name, value) in ret)
 
 
