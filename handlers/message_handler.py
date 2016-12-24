@@ -13,7 +13,7 @@ CMD_ENUM = "!enum "
 
 
 def max_response(message):
-	return 10 if message.channel.is_private else 2
+	return 5 if message.channel.is_private else 2
 
 
 def log(message, response, edited):
