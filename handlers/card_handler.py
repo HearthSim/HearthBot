@@ -57,8 +57,9 @@ class CardHandler():
 			cards = []
 			for card in db.values():
 				if collectible is None or collectible == card.collectible:
+					card_name = card.name.lower()
 					if (
-						term_num is None and term in card.name.lower()
+						term_num is None and (term == ("\"%s\"" % card_name) or term in card_name)
 						or term_num is not None and term_num == card.dbf_id
 					):
 						cards.append(card)

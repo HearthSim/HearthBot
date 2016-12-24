@@ -40,7 +40,11 @@ class EnumHandler():
 				term = parts[i + 1].strip().lower()
 				if not len(term):
 					continue
-				if term in enum.name.lower() or numValues[i] and enum.value == numValues[i]:
+				enum_name = enum.name.lower()
+				if (
+					term == ("\"%s\"" % enum_name) or term in enum_name
+				 	or numValues[i] and enum.value == numValues[i]
+				):
 					pair = (enum.name, enum.value)
 					if pair not in ret:
 						ret.append(pair)
