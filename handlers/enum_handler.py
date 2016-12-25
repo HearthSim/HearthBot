@@ -11,6 +11,10 @@ def pretty_list(items):
 
 
 class EnumHandler():
+	def __init__(self, config):
+		self.max_response = int(config["max_enum"])
+
+
 	def handle(self, input):
 		targetEnum = None
 		parts = input.split(" ")
@@ -50,8 +54,8 @@ class EnumHandler():
 						ret.append(pair)
 		if len(ret) == 0:
 			return "Tag not found"
-		if len(ret) > 40:
-			return "More than 40 matches, please be more specific"
+		if len(ret) > self.max_response:
+			return "More than %s matches, please be more specific" % self.max_response
 		return ", ".join("`%s = %s`" % (name, value) for (name, value) in ret)
 
 

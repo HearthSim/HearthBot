@@ -1,5 +1,8 @@
 {
 	"token":"DISCORD_TOKEN",
+	"max_cards_private": 5,
+	"max_cards_public": 2,
+	"max_enum": 40,
 	"repos":[
 		{
 			"name": "HearthSim/Hearthstone-Deck-Tracker",

@@ -12,10 +12,6 @@ CMD_TAG = "!tag "
 CMD_ENUM = "!enum "
 
 
-def max_response(message):
-	return 5 if message.channel.is_private else 2
-
-
 def log(message, response, edited):
 	print("[%s]" % (message.channel), message.content.encode("utf-8"))
 	print("Reponse:", response.encode("utf-8"), edited)
@@ -26,7 +22,9 @@ class MessageHandler():
 		self.client = client
 		self.issue_handler = IssueHandler(config["repos"])
 		self.card_handler = CardHandler()
-		self.enum_handler = EnumHandler()
+		self.enum_handler = EnumHandler(config)
+		self.max_cards_public = int(config["max_cards_public"])
+		self.max_cards_private = int(config["max_cards_private"])
 
 
 	async def handle(self, message):
@@ -78,7 +76,7 @@ class MessageHandler():
 
 
 	async def handle_card(self, message, cmd, my_message, collectible=None):
-		response = self.card_handler.handle(message.content[len(cmd):], max_response(message), collectible)
+		response = self.card_handler.handle(message.content[len(cmd):], self.max_response(message), collectible)
 		await self.respond(message, response, my_message)
 
 
@@ -89,3 +87,7 @@ class MessageHandler():
 				await self.handle_cmd(message, sent)
 				return
 			await asyncio.sleep(1)
+
+
+	def max_response(self, message):
+		return self.max_cards_private if message.channel.is_private else self.max_cards_public

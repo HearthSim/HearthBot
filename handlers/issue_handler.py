@@ -6,7 +6,7 @@ class IssueHandler():
 	def handle(self, channel, prefix, issue):
 		repo = self.find_repo(prefix, channel)
 		if repo is not None:
-			return "https://github.com/" + repo + "/issues/" + issue;
+			return "https://github.com/" + repo + "/issues/" + issue
 
 
 	def find_repo(self, prefix, channel):
