@@ -1,3 +1,4 @@
+import re
 import inspect
 from hearthstone import enums
 
@@ -32,16 +33,24 @@ class EnumHandler():
 			return self.find_enum(enum_classes, target_name)
 
 		ret = []
-		term_count = len(parts) - 1
+		terms = parts[1:]
+		match = re.match(r"^(\d*)-(\d*)$", terms[0])
+		if len(terms) == 1 and match:
+			lower = match.group(1) and int(match.group(1)) or 0
+			upper = match.group(2) and int(match.group(2)) or lower + self.max_response
+			terms = [str(x) for x in range(lower, upper + 1)]
+
+		term_count = len(terms)
 		numValues = [None] * term_count
+
 		for i in range(0, term_count):
 			try:
-				numValues[i] = int(parts[i + 1].strip())
+				numValues[i] = int(terms[i].strip())
 			except Exception:
 				pass
 		for enum in targetEnum:
 			for i in range(0, term_count):
-				term = parts[i + 1].strip().lower()
+				term = terms[i].strip().lower()
 				if not len(term):
 					continue
 				enum_name = enum.name.lower()
