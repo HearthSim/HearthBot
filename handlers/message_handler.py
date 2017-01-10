@@ -33,7 +33,7 @@ class MessageHandler():
 		if await self.handle_cmd(message):
 			return
 
-		matches = re.findall(r"(?<!<)(\w+)?#(\d+)($|\s)", message.content)
+		matches = re.findall(r"(?<!<)(\w+)?#(\d+)($|\s|[^\w])", message.content)
 		if len(matches):
 			print("[%s]" % (message.channel), message.content)
 		for match in matches:
