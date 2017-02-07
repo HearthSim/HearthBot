@@ -95,9 +95,12 @@ class CardHandler():
 	def stringify_card(self, card, index=0, total=0, params=None):
 		locale = card.locale
 		tags = ""
+		reqs = ""
 		if params:
 			if params.get("tags", False):
 				tags = "\n%s" % self.get_tags(card)
+			if params.get("reqs", False):
+				reqs = "\n%s" % self.get_reqs(card)
 			lang = params.get("lang", None)
 			if lang:
 				if len(lang) != 4:
@@ -116,10 +119,17 @@ class CardHandler():
 		text = "\n" + card.loc_text(locale) if len(card.description) else ""
 		flavor = "\n> " + card.loc_flavor(locale) if len(card.flavortext) else ""
 		return (
-			"```Markdown\n[%s][%s][%s]%s%s%s%s%s\n```"
-			% (card.loc_name(locale), card.id, card.dbf_id, search_index, descr, text, flavor, tags)
+			"```Markdown\n[%s][%s][%s]%s%s%s%s%s%s\n```"
+			% (card.loc_name(locale), card.id, card.dbf_id, search_index, descr, text, flavor, tags, reqs)
 		)
 
 
 	def get_tags(self, card):
 		return ", ".join("%s=%s" % (key.name, card.tags[key]) for key in card.tags.keys())
+
+	def get_reqs(self, card):
+		reqs = []
+		for key in card.requirements.keys():
+			val = "=%s" % card.requirements[key] if card.requirements[key] else ""
+			reqs.append("%s%s" % (key.name, val))
+		return ", ".join(reqs)
