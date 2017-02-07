@@ -7,6 +7,7 @@ Hearthstone/Github bot for Discord
   - Use `!cardc` to search for collectible and `!cardn` for non-collectible cards only
   - Supported flags:
     - `--tags`: Lists all tags on the card
+    - `--reqs`: Lists all play requirements for the card
     - `--lang=[enUS|deDE|zhCN|...]`: prints card name, text and flavor text in given language
 - `!enum [EnumName] [partial_name|"exact_name"|value]` 
   - `EnumName` can be the [class name](https://github.com/HearthSim/python-hearthstone/blob/master/hearthstone/enums.py#L599) or the [original name](https://github.com/HearthSim/python-hearthstone/blob/master/hearthstone/enums.py#L600)
