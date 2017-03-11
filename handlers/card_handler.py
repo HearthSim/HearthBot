@@ -31,14 +31,14 @@ class CardHandler():
 			self.db[key.lower()] = db[key]
 
 
-	def handle(self, input, max_response, collectible=None):
+	def handle(self, input, max_response, authorized, collectible=None):
 		print("input:", input)
 		term, params = self.parse_input(input)
 
 		try:
 			card = self.db[term]
 			if card is not None:
-				return self.stringify_card(card, params=params)
+				return self.stringify_card(card, authorized, params=params)
 		except Exception as e:
 			print(e)
 
@@ -68,12 +68,12 @@ class CardHandler():
 			if num_cards == 0:
 				return "Card not found"
 			if num_cards == 1:
-				return self.stringify_card(cards[0], 0, 0, params)
+				return self.stringify_card(cards[0], authorized, 0, 0, params)
 			if index >= 0:
-				return self.stringify_card(cards[index-1], index, num_cards, params)
+				return self.stringify_card(cards[index-1], authorized, index, num_cards, params)
 
 			return "\n".join(
-				self.stringify_card(cards[i], i + 1, num_cards, params)
+				self.stringify_card(cards[i], authorized, i + 1, num_cards, params)
 				for i in range(0, min(max_response, num_cards))
 			)
 		except Exception as e:
@@ -92,7 +92,7 @@ class CardHandler():
 		return term, params
 
 
-	def stringify_card(self, card, index=0, total=0, params=None):
+	def stringify_card(self, card, authorized, index=0, total=0, params=None):
 		locale = card.locale
 		tags = ""
 		reqs = ""
@@ -118,11 +118,14 @@ class CardHandler():
 		descr = "\n[%s Mana,%s%s %s%s]" % (card.cost, stats, rarity, card.type.name.title(), race)
 		text = "\n" + card.loc_text(locale) if len(card.description) else ""
 		flavor = "\n> " + card.loc_flavor(locale) if len(card.flavortext) else ""
+		url = "https://hsreplay.net/cards/" + str(card.dbf_id) if authorized and self.has_link(card) else ""
 		return (
-			"```Markdown\n[%s][%s][%s]%s%s%s%s%s%s\n```"
-			% (card.loc_name(locale), card.id, card.dbf_id, search_index, descr, text, flavor, tags, reqs)
+			"```Markdown\n[%s][%s][%s]%s%s%s%s%s%s\n```%s"
+			% (card.loc_name(locale), card.id, card.dbf_id, search_index, descr, text, flavor, tags, reqs, url)
 		)
 
+	def has_link(self, card):
+		return card.collectible and card.type.name in ["MINION", "SPELL", "WEAPON"]
 
 	def get_tags(self, card):
 		return ", ".join("%s=%s" % (key.name, card.tags[key]) for key in card.tags.keys())
