@@ -47,7 +47,7 @@ class CardHandler():
 			match = re.match(r"^(.+?)\s+(\d+)$", term)
 			if match is not None:
 				term = match.group(1).strip()
-				page = int(match.group(2))
+				page = max(1, int(match.group(2)))
 
 			term_num = None
 			try:
@@ -70,14 +70,18 @@ class CardHandler():
 			if num_cards == 1:
 				return self.stringify_card(cards[0], authorized, 0, 0, params)
 
-			pagesize = min(max_response, num_cards)
-			offset = max(0, (page - 1) * pagesize)
-			hint = (
-				"```Page 1/%d - append '2' to see the second page.```" % (num_cards / pagesize)
-			) if not offset else ""
+			page_size = min(max_response, num_cards)
+			page_count = int(num_cards / page_size)
+			page_index_hint = (
+				" - What are you trying to do here?! It clearly says %d!" % (page_count)
+			 ) if page > page_count else ""
+			page = min(page, page_count)
+			offset = max(0, (page - 1) * page_size)
+			next_page_hint = " - append '2' to see the second page." if not offset else ""
+			hint = "```Page %d/%d%s```" % (page, page_count, next_page_hint or page_index_hint)
 			return hint + "".join(
 				self.stringify_card(cards[i], authorized, i + 1, num_cards, params)
-				for i in range(offset, min(offset + pagesize, num_cards))
+				for i in range(offset, min(offset + page_size, num_cards))
 			)
 		except Exception as e:
 			print(e)
@@ -114,7 +118,6 @@ class CardHandler():
 				except Exception:
 					return ERR_LANG_NOT_FOUND
 		health = card.durability if card.type == CardType.WEAPON else card.health
-		search_index = " (%s/%s)" % (index, total) if total > 0 else ""
 		stats = " %s/%s" % (card.atk, health) if card.atk + health > 0 else ""
 		race = " (%s)" % (card.race.name.title()) if card.race != Race.INVALID else ""
 		rarity = " %s" % card.rarity.name.title() if card.rarity != Rarity.INVALID else ""
@@ -123,8 +126,8 @@ class CardHandler():
 		flavor = "\n> " + card.loc_flavor(locale) if len(card.flavortext) else ""
 		url = "https://hsreplay.net/cards/%s\n" % (card.dbf_id) if authorized and self.has_link(card) else ""
 		return (
-			"```Markdown\n[%s][%s][%s]%s%s%s%s%s%s```%s"
-			% (card.loc_name(locale), card.id, card.dbf_id, search_index, descr, text, flavor, tags, reqs, url)
+			"```Markdown\n[%s][%s][%s]%s%s%s%s%s```%s"
+			% (card.loc_name(locale), card.id, card.dbf_id, descr, text, flavor, tags, reqs, url)
 		)
 
 	def has_link(self, card):
