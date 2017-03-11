@@ -8,6 +8,7 @@ from .enum_handler import EnumHandler
 CMD_CARD = "!card "
 CMD_CARD_COLLECTIBLE = "!cardc "
 CMD_CARD_NONCOLLECTIBLE = "!cardn "
+CMD_HELP = "!help"
 CMD_TAG = "!tag "
 CMD_ENUM = "!enum "
 
@@ -64,6 +65,8 @@ class MessageHandler():
 			response = self.enum_handler.handle(message.content[len(CMD_ENUM):])
 			await self.respond(message, response, my_message)
 			return True
+		if message.content.startswith(CMD_HELP):
+			await self.respond(message, "https://github.com/HearthSim/hearthbot#available-commands")
 		return False
 
 
