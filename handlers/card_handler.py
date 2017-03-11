@@ -43,11 +43,11 @@ class CardHandler():
 			print(e)
 
 		try:
-			index = -1
+			page = 1
 			match = re.match(r"^(.+?)\s+(\d+)$", term)
 			if match is not None:
 				term = match.group(1).strip()
-				index = int(match.group(2))
+				page = int(match.group(2))
 
 			term_num = None
 			try:
@@ -69,12 +69,15 @@ class CardHandler():
 				return "Card not found"
 			if num_cards == 1:
 				return self.stringify_card(cards[0], authorized, 0, 0, params)
-			if index >= 0:
-				return self.stringify_card(cards[index-1], authorized, index, num_cards, params)
 
-			return "\n".join(
+			pagesize = min(max_response, num_cards)
+			offset = max(0, (page - 1) * pagesize)
+			hint = (
+				"```Page 1/%d - append '2' to see the second page.```" % (num_cards / pagesize)
+			) if not offset else ""
+			return hint + "".join(
 				self.stringify_card(cards[i], authorized, i + 1, num_cards, params)
-				for i in range(0, min(max_response, num_cards))
+				for i in range(offset, min(offset + pagesize, num_cards))
 			)
 		except Exception as e:
 			print(e)
@@ -118,9 +121,9 @@ class CardHandler():
 		descr = "\n[%s Mana,%s%s %s%s]" % (card.cost, stats, rarity, card.type.name.title(), race)
 		text = "\n" + card.loc_text(locale) if len(card.description) else ""
 		flavor = "\n> " + card.loc_flavor(locale) if len(card.flavortext) else ""
-		url = "https://hsreplay.net/cards/" + str(card.dbf_id) if authorized and self.has_link(card) else ""
+		url = "https://hsreplay.net/cards/%s\n" % (card.dbf_id) if authorized and self.has_link(card) else ""
 		return (
-			"```Markdown\n[%s][%s][%s]%s%s%s%s%s%s\n```%s"
+			"```Markdown\n[%s][%s][%s]%s%s%s%s%s%s```%s"
 			% (card.loc_name(locale), card.id, card.dbf_id, search_index, descr, text, flavor, tags, reqs, url)
 		)
 
