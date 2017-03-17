@@ -78,7 +78,9 @@ class CardHandler():
 			page = min(page, page_count)
 			offset = max(0, (page - 1) * page_size)
 			next_page_hint = " - append '2' to see the second page." if not offset else ""
-			hint = "```Page %d/%d%s```" % (page, page_count, next_page_hint or page_index_hint)
+			hint = (
+				"```Page %d/%d%s```" % (page, page_count, next_page_hint or page_index_hint)
+			) if page_count > 1 else ""
 			return hint + "".join(
 				self.stringify_card(cards[i], authorized, i + 1, num_cards, params)
 				for i in range(offset, min(offset + page_size, num_cards))
