@@ -13,6 +13,7 @@ CMD_CARD_NONCOLLECTIBLE = "!cardn "
 CMD_HELP = "!help"
 CMD_TAG = "!tag "
 CMD_ENUM = "!enum "
+CMD_INVITE = "!invite"
 
 USAGE = """
 HearthBot v%s
@@ -29,9 +30,10 @@ Extra arguments (advanced):
   * `!card "Charge" --reqs` -> List the Play Requirements for the card.
   * `!card "Charge" --tags` -> List the GameTags for the card.
 
-Find the source code here: https://github.com/HearthSim/HearthBot
-
-Made with love by HearthSim. https://discord.gg/hearthsim
+Made with love by HearthSim.
+  * Support and discussion: https://discord.gg/hearthsim
+  * Source code: https://github.com/HearthSim/HearthBot
+  * Invite me to your server! PM me `!invite` for an invitation URL.
 
 Pro tip: Typo'd your search? Edit it and I will edit my response. :)
 """.strip() % (__version__)
@@ -51,6 +53,7 @@ class MessageHandler():
 		self.max_cards_public = int(config["max_cards_public"])
 		self.max_cards_private = int(config["max_cards_private"])
 		self.authorized_channels = [int(x) for x in config["authorized_channels"]]
+		self.invite_url = config.get("invite_url", "")
 
 	async def handle(self, message):
 		if message.author.id == self.client.user.id:
@@ -73,25 +76,37 @@ class MessageHandler():
 		if message.content.startswith(CMD_CARD):
 			await self.handle_card(message, CMD_CARD, my_message)
 			return True
+
 		if message.content.startswith(CMD_CARD_COLLECTIBLE):
 			await self.handle_card(message, CMD_CARD_COLLECTIBLE, my_message, True)
 			return True
+
 		if message.content.startswith(CMD_CARD_NONCOLLECTIBLE):
 			await self.handle_card(message, CMD_CARD_NONCOLLECTIBLE, my_message, False)
 			return True
+
 		if message.content.startswith(CMD_TAG):
 			response = self.enum_handler.handle("GameTag " + message.content[len(CMD_TAG):])
 			await self.respond(message, response, my_message)
 			return True
+
 		if message.content.startswith(CMD_ENUM):
 			response = self.enum_handler.handle(message.content[len(CMD_ENUM):])
 			await self.respond(message, response, my_message)
 			return True
+
 		if message.content.startswith(CMD_HELP):
 			if message.channel.is_private:
 				await self.respond(message, USAGE)
 			else:
 				await self.respond(message, "PM me !help for available commands. <3")
+
+		if message.content.startswith(CMD_INVITE) and message.channel.is_private:
+			if self.invite_url:
+				await self.respond(message, self.invite_url)
+			else:
+				await self.respond(message, "No `invite_url` key found in the configuration.")
+
 		return False
 
 	async def respond(self, message, response, my_message=None):

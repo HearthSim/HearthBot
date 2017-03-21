@@ -3,6 +3,7 @@
 	"max_cards_private": 5,
 	"max_cards_public": 2,
 	"max_enum": 40,
+	"invite_url": "https://discordapp.com/oauth2/authorize?client_id=...&scope=bot&permissions=101376",
 	"repos":[
 		{
 			"name": "HearthSim/Hearthstone-Deck-Tracker",
