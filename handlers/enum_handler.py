@@ -1,5 +1,5 @@
-import re
 import inspect
+import re
 from hearthstone import enums
 
 
@@ -14,7 +14,6 @@ def pretty_list(items):
 class EnumHandler():
 	def __init__(self, config):
 		self.max_response = int(config["max_enum"])
-
 
 	def handle(self, input):
 		targetEnum = None
@@ -55,8 +54,8 @@ class EnumHandler():
 					continue
 				enum_name = enum.name.lower()
 				if (
-					term == ("\"%s\"" % enum_name) or term in enum_name
-				 	or numValues[i] and enum.value == numValues[i]
+					term == ("\"%s\"" % enum_name) or term in enum_name or
+					numValues[i] and enum.value == numValues[i]
 				):
 					pair = (enum.name, enum.value)
 					if pair not in ret:
@@ -66,7 +65,6 @@ class EnumHandler():
 		if len(ret) > self.max_response:
 			return "More than %s matches, please be more specific" % self.max_response
 		return ", ".join("`%s = %s`" % (name, value) for (name, value) in ret)
-
 
 	def find_enum(self, enum_classes, target_name):
 		suggestions = []

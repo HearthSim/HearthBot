@@ -1,8 +1,8 @@
-import re
 import asyncio
-from .issue_handler import IssueHandler
+import re
 from .card_handler import CardHandler
 from .enum_handler import EnumHandler
+from .issue_handler import IssueHandler
 
 
 CMD_CARD = "!card "
@@ -28,7 +28,6 @@ class MessageHandler():
 		self.max_cards_private = int(config["max_cards_private"])
 		self.authorized_channels = [int(x) for x in config["authorized_channels"]]
 
-
 	async def handle(self, message):
 		if message.author.id == self.client.user.id:
 			return
@@ -45,7 +44,6 @@ class MessageHandler():
 			print("Reponse:", response.encode("utf-8") if response else "None")
 			if response is not None:
 				await self.client.send_message(message.channel, response)
-
 
 	async def handle_cmd(self, message, my_message=None):
 		if message.content.startswith(CMD_CARD):
@@ -69,7 +67,6 @@ class MessageHandler():
 			await self.respond(message, "https://github.com/HearthSim/hearthbot#available-commands")
 		return False
 
-
 	async def respond(self, message, response, my_message=None):
 		log(message, response, my_message is not None)
 		if my_message is None:
@@ -78,14 +75,12 @@ class MessageHandler():
 			await self.client.edit_message(my_message, response)
 		await self.check_edit(message, my_message)
 
-
 	async def handle_card(self, message, cmd, my_message, collectible=None):
 		authorized = int(message.channel.id) in self.authorized_channels
 		response = self.card_handler.handle(
 			message.content[len(cmd):], self.max_response(message), authorized, collectible
 		)
 		await self.respond(message, response, my_message)
-
 
 	async def check_edit(self, message, sent):
 		original_content = message.content
@@ -94,7 +89,6 @@ class MessageHandler():
 				await self.handle_cmd(message, sent)
 				return
 			await asyncio.sleep(1)
-
 
 	def max_response(self, message):
 		return self.max_cards_private if message.channel.is_private else self.max_cards_public

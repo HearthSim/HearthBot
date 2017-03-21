@@ -1,7 +1,7 @@
 import re
-from hearthstone.enums import CardType, GameTag, Race, Rarity
 from hearthstone import cardxml
 from hearthstone.cardxml import CardXML
+from hearthstone.enums import CardType, GameTag, Race, Rarity
 
 
 ERR_LANG_NOT_FOUND = "Language not found. Supported language keys are e.g. `enUS` or `deDE`"
@@ -13,11 +13,14 @@ db, _ = cardxml.load()
 def loc_name(self, locale):
 	return self.strings[GameTag.CARDNAME][locale]
 
+
 def loc_text(self, locale):
 	return self.strings[GameTag.CARDTEXT_INHAND][locale]
 
+
 def loc_flavor(self, locale):
 	return self.strings[GameTag.FLAVORTEXT][locale]
+
 
 CardXML.loc_name = loc_name
 CardXML.loc_text = loc_text
@@ -29,7 +32,6 @@ class CardHandler():
 		self.db = {}
 		for key in db.keys():
 			self.db[key.lower()] = db[key]
-
 
 	def handle(self, input, max_response, authorized, collectible=None):
 		print("input:", input)
@@ -59,8 +61,8 @@ class CardHandler():
 				if collectible is None or collectible == card.collectible:
 					card_name = card.name.lower()
 					if (
-						term_num is None and (term == ("\"%s\"" % card_name) or term in card_name)
-						or term_num is not None and term_num == card.dbf_id
+						term_num is None and (term == ("\"%s\"" % card_name) or term in card_name) or
+						term_num is not None and term_num == card.dbf_id
 					):
 						cards.append(card)
 			num_cards = len(cards)
@@ -74,7 +76,7 @@ class CardHandler():
 			page_count = int(num_cards / page_size)
 			page_index_hint = (
 				" - What are you trying to do here?! It clearly says %d!" % (page_count)
-			 ) if page > page_count else ""
+			) if page > page_count else ""
 			page = min(page, page_count)
 			offset = max(0, (page - 1) * page_size)
 			next_page_hint = " - append '2' to see the second page." if not offset else ""
@@ -89,7 +91,6 @@ class CardHandler():
 			print(e)
 		return "Card not found"
 
-
 	def parse_input(self, input):
 		parts = input.split(" --")
 		term = parts[0].strip().lower()
@@ -99,7 +100,6 @@ class CardHandler():
 			value = p[1] if len(p) > 1 else True
 			params[p[0].lower()] = value
 		return term, params
-
 
 	def stringify_card(self, card, authorized, index=0, total=0, params=None):
 		locale = card.locale
@@ -126,7 +126,11 @@ class CardHandler():
 		descr = "\n[%s Mana,%s%s %s%s]" % (card.cost, stats, rarity, card.type.name.title(), race)
 		text = "\n" + card.loc_text(locale) if len(card.description) else ""
 		flavor = "\n> " + card.loc_flavor(locale) if len(card.flavortext) else ""
-		url = "https://hsreplay.net/cards/%s\n" % (card.dbf_id) if authorized and self.has_link(card) else ""
+		if authorized and self.has_link(card):
+			url = "https://hsreplay.net/cards/%s\n" % (card.dbf_id)
+		else:
+			url = ""
+
 		return (
 			"```Markdown\n[%s][%s][%s]%s%s%s%s%s```%s"
 			% (card.loc_name(locale), card.id, card.dbf_id, descr, text, flavor, tags, reqs, url)
