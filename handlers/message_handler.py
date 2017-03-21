@@ -5,12 +5,36 @@ from .enum_handler import EnumHandler
 from .issue_handler import IssueHandler
 
 
+__version__ = "1.0.1"
+
 CMD_CARD = "!card "
 CMD_CARD_COLLECTIBLE = "!cardc "
 CMD_CARD_NONCOLLECTIBLE = "!cardn "
 CMD_HELP = "!help"
 CMD_TAG = "!tag "
 CMD_ENUM = "!enum "
+
+USAGE = """
+HearthBot v%s
+Type `!card <search>` in public channels or PM to search for a Hearthstone card.
+
+Example queries:
+  * `!card Charge` -> Search for all cards with Charge in the name.
+  * `!card "Charge"` -> Search for all cards with the exact name `Charge`.
+  * `!card CS2_103` -> Search for a card by ID (exact match - CS2_103 is Charge).
+  * `!card 344` -> Search for a card by ID (exact match - 344 is Charge).
+
+Extra arguments (advanced):
+  * `!card "Charge" --lang=frFR` -> Output the results in French.
+  * `!card "Charge" --reqs` -> List the Play Requirements for the card.
+  * `!card "Charge" --tags` -> List the GameTags for the card.
+
+Find the source code here: https://github.com/HearthSim/HearthBot
+
+Made with love by HearthSim. https://discord.gg/hearthsim
+
+Pro tip: Typo'd your search? Edit it and I will edit my response. :)
+""".strip() % (__version__)
 
 
 def log(message, response, edited):
@@ -64,7 +88,10 @@ class MessageHandler():
 			await self.respond(message, response, my_message)
 			return True
 		if message.content.startswith(CMD_HELP):
-			await self.respond(message, "https://github.com/HearthSim/hearthbot#available-commands")
+			if message.channel.is_private:
+				await self.respond(message, USAGE)
+			else:
+				await self.respond(message, "PM me !help for available commands. <3")
 		return False
 
 	async def respond(self, message, response, my_message=None):
