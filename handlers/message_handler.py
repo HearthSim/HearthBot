@@ -1,5 +1,6 @@
 import asyncio
 import re
+import sys
 from .card_handler import CardHandler
 from .enum_handler import EnumHandler
 from .issue_handler import IssueHandler
@@ -39,9 +40,11 @@ Pro tip: Typo'd your search? Edit it and I will edit my response. :)
 """.strip() % (__version__)
 
 
-def log(message, response, edited):
-	print("[%s]" % (message.channel), message.content.encode("utf-8"))
-	print("Reponse:", response.encode("utf-8"), edited)
+def log_message(message):
+	sys.stdout.write("[%s] [%s] [%s] %s\n" % (
+		message.server, message.channel, message.author, message.content.encode("utf-8"))
+	)
+	sys.stdout.flush()
 
 
 class MessageHandler():
@@ -62,13 +65,10 @@ class MessageHandler():
 			return
 
 		matches = re.findall(r"(?<!<)(\w+)?#(\d+)($|\s|[^\w])", message.content)
-		if len(matches):
-			print("[%s]" % (message.channel), message.content)
 		for match in matches:
 			prefix = match[0]
 			issue = match[1]
 			response = self.issue_handler.handle(message.channel.name, prefix, issue)
-			print("Reponse:", response.encode("utf-8") if response else "None")
 			if response is not None:
 				await self.client.send_message(message.channel, response)
 
@@ -100,17 +100,22 @@ class MessageHandler():
 				await self.respond(message, USAGE)
 			else:
 				await self.respond(message, "PM me !help for available commands. <3")
+			return True
 
-		if message.content.startswith(CMD_INVITE) and message.channel.is_private:
-			if self.invite_url:
-				await self.respond(message, self.invite_url)
+		if message.channel.is_private:
+			if message.content.startswith(CMD_INVITE):
+				if self.invite_url:
+					await self.respond(message, self.invite_url)
+				else:
+					await self.respond(message, "No `invite_url` key found in the configuration.")
+				return True
 			else:
-				await self.respond(message, "No `invite_url` key found in the configuration.")
+				log_message(message)
 
 		return False
 
 	async def respond(self, message, response, my_message=None):
-		log(message, response, my_message is not None)
+		log_message(message)
 		if my_message is None:
 			my_message = await self.client.send_message(message.channel, response)
 		else:

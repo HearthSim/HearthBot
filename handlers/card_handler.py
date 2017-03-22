@@ -34,7 +34,6 @@ class CardHandler():
 			self.db[key.lower()] = db[key]
 
 	def handle(self, input, max_response, authorized, collectible=None):
-		print("input:", input)
 		term, params = self.parse_input(input)
 
 		try:
@@ -66,7 +65,6 @@ class CardHandler():
 					):
 						cards.append(card)
 			num_cards = len(cards)
-			print("num_cards", num_cards)
 			if num_cards == 0:
 				return "Card not found"
 			if num_cards == 1:
