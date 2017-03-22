@@ -1,6 +1,7 @@
 import asyncio
 import re
 import sys
+from datetime import datetime
 from .card_handler import CardHandler
 from .enum_handler import EnumHandler
 from .issue_handler import IssueHandler
@@ -41,8 +42,9 @@ Pro tip: Typo'd your search? Edit it and I will edit my response. :)
 
 
 def log_message(message):
-	sys.stdout.write("[%s] [%s] [%s] %s\n" % (
-		message.server, message.channel, message.author, message.content.encode("utf-8"))
+	timestamp = datetime.now().isoformat()
+	sys.stdout.write("[%s] [%s] [%s] [%s] %s\n" % (
+		timestamp, message.server, message.channel, message.author, message.content)
 	)
 	sys.stdout.flush()
 
