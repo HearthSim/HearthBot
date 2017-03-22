@@ -36,12 +36,10 @@ class CardHandler():
 	def handle(self, input, max_response, authorized, collectible=None):
 		term, params = self.parse_input(input)
 
-		try:
+		if term in self.db:
 			card = self.db[term]
 			if card is not None:
 				return self.stringify_card(card, authorized, params=params)
-		except Exception as e:
-			print(e)
 
 		try:
 			page = 1
