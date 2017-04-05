@@ -39,7 +39,7 @@ class CardHandler():
 		if term in self.db:
 			card = self.db[term]
 			if card is not None:
-				return self.stringify_card(card, params=params)
+				return self.stringify_card(card, include_url=True, params=params)
 
 		try:
 			page = 1
@@ -66,7 +66,7 @@ class CardHandler():
 			if num_cards == 0:
 				return "Card not found"
 			if num_cards == 1:
-				return self.stringify_card(cards[0], 0, 0, params)
+				return self.stringify_card(cards[0], 0, 0, True, params)
 
 			page_size = min(max_response, num_cards)
 			page_count = int(num_cards / page_size)
@@ -97,7 +97,7 @@ class CardHandler():
 			params[p[0].lower()] = value
 		return term, params
 
-	def stringify_card(self, card, index=0, total=0, params=None):
+	def stringify_card(self, card, index=0, total=0, include_url=False, params=None):
 		locale = card.locale
 		tags = ""
 		reqs = ""
@@ -122,7 +122,7 @@ class CardHandler():
 		descr = "\n[%s Mana,%s%s %s%s]" % (card.cost, stats, rarity, card.type.name.title(), race)
 		text = "\n" + card.loc_text(locale) if len(card.description) else ""
 		flavor = "\n> " + card.loc_flavor(locale) if len(card.flavortext) else ""
-		if self.has_link(card):
+		if include_url and self.has_link(card):
 			url = "https://hsreplay.net/cards/%s\n" % (card.dbf_id)
 		else:
 			url = ""
