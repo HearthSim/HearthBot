@@ -30,6 +30,5 @@
 			"prefixes": ["bugs", "bug"],
 			"channels": []
 		}
-	],
-	"authorized_channels": []
+	]
 }

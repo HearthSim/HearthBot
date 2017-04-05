@@ -57,7 +57,6 @@ class MessageHandler():
 		self.enum_handler = EnumHandler(config)
 		self.max_cards_public = int(config["max_cards_public"])
 		self.max_cards_private = int(config["max_cards_private"])
-		self.authorized_channels = [int(x) for x in config["authorized_channels"]]
 		self.invite_url = config.get("invite_url", "")
 
 	async def handle(self, message):
@@ -125,9 +124,8 @@ class MessageHandler():
 		await self.check_edit(message, my_message)
 
 	async def handle_card(self, message, cmd, my_message, collectible=None):
-		authorized = int(message.channel.id) in self.authorized_channels
 		response = self.card_handler.handle(
-			message.content[len(cmd):], self.max_response(message), authorized, collectible
+			message.content[len(cmd):], self.max_response(message), collectible
 		)
 		await self.respond(message, response, my_message)
 
