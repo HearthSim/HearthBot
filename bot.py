@@ -12,6 +12,7 @@ def main():
 	p.add_argument("--config", required=True, help="Path to configuration file")
 	p.add_argument("--sync-roles", action="store_true")
 	args = p.parse_args()
+	sync_roles = args.sync_roles
 
 	with open(args.config, "r") as f:
 		config = json.load(f)
@@ -23,7 +24,7 @@ def main():
 	async def on_ready():
 		print("Logged in as", client.user.name)
 
-		if args.sync_roles:
+		if sync_roles:
 			p = subprocess.Popen(
 				config["sync_roles"]["command"],
 				stdin=subprocess.PIPE, stdout=subprocess.PIPE, stderr=subprocess.PIPE
@@ -64,7 +65,8 @@ def main():
 
 	@client.event
 	async def on_message(message):
-		await message_handler.handle(message)
+		if not sync_roles:
+			await message_handler.handle(message)
 
 	client.run(config["token"])
 
