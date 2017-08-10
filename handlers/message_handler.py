@@ -16,6 +16,7 @@ CMD_HELP = "!help"
 CMD_TAG = "!tag "
 CMD_ENUM = "!enum "
 CMD_INVITE = "!invite"
+CMD_PLUGINS = "!plugins"
 
 USAGE = """
 HearthBot v%s
@@ -39,6 +40,8 @@ Made with love by HearthSim.
 
 Pro tip: Typo'd your search? Edit it and I will edit my response. :)
 """.strip() % (__version__)
+
+PLUGINS_URL = "https://github.com/HearthSim/Hearthstone-Deck-Tracker/wiki/Available-Plugins"
 
 
 def log_message(message):
@@ -94,6 +97,10 @@ class MessageHandler():
 		if message.content.startswith(CMD_ENUM):
 			response = self.enum_handler.handle(message.content[len(CMD_ENUM):])
 			await self.respond(message, response, my_message)
+			return True
+
+		if message.content.startswith(CMD_PLUGINS):
+			await self.respond(message, PLUGINS_URL, my_message)
 			return True
 
 		if message.content.startswith(CMD_HELP):
