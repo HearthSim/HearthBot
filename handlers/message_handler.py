@@ -59,7 +59,7 @@ class MessageHandler():
 		self.issue_handler = IssueHandler(config["repos"])
 		self.card_handler = CardHandler()
 		self.enum_handler = EnumHandler(config)
-		self.deck_handler = DeckHandler()
+		self.deck_handler = DeckHandler(config["deck_response"])
 		self.max_cards_public = int(config["max_cards_public"])
 		self.max_cards_private = int(config["max_cards_private"])
 		self.invite_url = config.get("invite_url", "")
