@@ -5,6 +5,7 @@ from datetime import datetime
 from .card_handler import CardHandler
 from .enum_handler import EnumHandler
 from .issue_handler import IssueHandler
+from .deck_handler import DeckHandler
 
 
 __version__ = "1.0.1"
@@ -58,6 +59,7 @@ class MessageHandler():
 		self.issue_handler = IssueHandler(config["repos"])
 		self.card_handler = CardHandler()
 		self.enum_handler = EnumHandler(config)
+		self.deck_handler = DeckHandler(config["deck_response"])
 		self.max_cards_public = int(config["max_cards_public"])
 		self.max_cards_private = int(config["max_cards_private"])
 		self.invite_url = config.get("invite_url", "")
@@ -75,6 +77,10 @@ class MessageHandler():
 			response = self.issue_handler.handle(message.channel.name, prefix, issue)
 			if response is not None:
 				await self.client.send_message(message.channel, response)
+
+		deckresponse = self.deck_handler.handle(message.content)
+		if deckresponse is not None:
+			await self.client.send_message(message.channel, deckresponse)
 
 	async def handle_cmd(self, message, my_message=None):
 		if message.content.startswith(CMD_CARD):
