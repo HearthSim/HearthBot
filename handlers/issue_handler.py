@@ -1,4 +1,4 @@
-class IssueHandler():
+class IssueHandler:
 	def __init__(self, repos):
 		self.repos = repos
 

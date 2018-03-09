@@ -2,12 +2,14 @@ import asyncio
 import re
 import sys
 from datetime import datetime
+
 from .card_handler import CardHandler
 from .enum_handler import EnumHandler
 from .issue_handler import IssueHandler
 
 
 __version__ = "1.0.1"
+
 
 CMD_CARD = "!card "
 CMD_CARD_COLLECTIBLE = "!cardc "
@@ -23,20 +25,20 @@ HearthBot v%s
 Type `!card <search>` in public channels or PM to search for a Hearthstone card.
 
 Example queries:
-  * `!card Charge` -> Search for all cards with Charge in the name.
-  * `!card "Charge"` -> Search for all cards with the exact name `Charge`.
-  * `!card CS2_103` -> Search for a card by ID (exact match - CS2_103 is Charge).
-  * `!card 344` -> Search for a card by ID (exact match - 344 is Charge).
+* `!card Charge` -> Search for all cards with Charge in the name.
+* `!card "Charge"` -> Search for all cards with the exact name `Charge`.
+* `!card CS2_103` -> Search for a card by ID (exact match - CS2_103 is Charge).
+* `!card 344` -> Search for a card by ID (exact match - 344 is Charge).
 
 Extra arguments (advanced):
-  * `!card "Charge" --lang=frFR` -> Output the results in French.
-  * `!card "Charge" --reqs` -> List the Play Requirements for the card.
-  * `!card "Charge" --tags` -> List the GameTags for the card.
+* `!card "Charge" --lang=frFR` -> Output the results in French.
+* `!card "Charge" --reqs` -> List the Play Requirements for the card.
+* `!card "Charge" --tags` -> List the GameTags for the card.
 
 Made with love by HearthSim.
-  * Support and discussion: https://discord.gg/hearthsim
-  * Source code: https://github.com/HearthSim/HearthBot
-  * Invite me to your server! PM me `!invite` for an invitation URL.
+* Support and discussion: https://discord.gg/hearthsim
+* Source code: https://github.com/HearthSim/HearthBot
+* Invite me to your server! PM me `!invite` for an invitation URL.
 
 Pro tip: Typo'd your search? Edit it and I will edit my response. :)
 """.strip() % (__version__)
@@ -52,7 +54,7 @@ def log_message(message):
 	sys.stdout.flush()
 
 
-class MessageHandler():
+class MessageHandler:
 	def __init__(self, config, client):
 		self.client = client
 		self.issue_handler = IssueHandler(config["repos"])

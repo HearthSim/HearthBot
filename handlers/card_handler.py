@@ -1,4 +1,5 @@
 import re
+
 from hearthstone import cardxml
 from hearthstone.cardxml import CardXML
 from hearthstone.enums import CardType, GameTag, Race, Rarity
