@@ -21,10 +21,10 @@ class EnumHandler:
 	def handle(self, input):
 		target_enum = None
 		parts = input.split()
-		target_name = parts[0].lower()
-
-		if len(parts) < 2:
+		if not parts:
 			return "Invalid number of arguments. Use '!enum [ENUM_NAME] [NAME|VALUE]'"
+
+		target_name = parts[0].lower()
 
 		enum_classes = inspect.getmembers(enums, inspect.isclass)
 		for enum_class in enum_classes:
@@ -36,11 +36,14 @@ class EnumHandler:
 
 		ret = []
 		terms = parts[1:]
-		match = re.match(r"^(\d*)-(\d*)$", terms[0])
-		if len(terms) == 1 and match:
-			lower = match.group(1) and int(match.group(1)) or 0
-			upper = match.group(2) and int(match.group(2)) or lower + self.max_response
-			terms = [str(x) for x in range(lower, upper + 1)]
+		if terms:
+			match = re.match(r"^(\d*)-(\d*)$", terms[0])
+			if len(terms) == 1 and match:
+				lower = match.group(1) and int(match.group(1)) or 0
+				upper = match.group(2) and int(match.group(2)) or lower + self.max_response
+				terms = [str(x) for x in range(lower, upper + 1)]
+		else:
+			terms = [str(x) for x in range(0, self.max_response + 1)]
 
 		term_count = len(terms)
 		num_values = [None] * term_count
