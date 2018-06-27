@@ -31,7 +31,8 @@ def main():
 				stdin=subprocess.PIPE, stdout=subprocess.PIPE, stderr=subprocess.PIPE
 			)
 			output, stderr = p.communicate()
-			if stderr:
+			if stderr and b"psycopg2-binary" not in stderr:
+				# ignore psycopg2-binary warning (sigh)
 				raise RuntimeError("Error while running command: %r" % (stderr))
 			accounts = json.loads(output.decode("utf-8"))
 			discord_ids = [account_data["discord_id"] for account_data in accounts]
