@@ -9,5 +9,9 @@ class IssueHandler:
 
 	def find_repo(self, prefix, channel):
 		for repo in self.repos:
-			if prefix in repo["prefixes"] or (prefix is "" and channel in repo["channels"]):
+			if prefix is "" and channel in repo["channels"]:
+				# "Look at #123"
+				return repo["name"]
+			if prefix in repo["prefixes"] or prefix.lower() in repo["prefixes"]:
+				# "Look at bugs#123"
 				return repo["name"]
