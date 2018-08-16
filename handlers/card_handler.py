@@ -137,7 +137,9 @@ class CardHandler():
 		return card.collectible and card.type.name in ["MINION", "SPELL", "WEAPON"]
 
 	def get_tags(self, card):
-		return ", ".join("%s=%s" % (key.name, card.tags[key]) for key in card.tags.keys())
+		return ", ".join("%s=%s" % (
+			getattr(key, "name", int(key)), card.tags[key]
+		) for key in card.tags.keys())
 
 	def get_reqs(self, card):
 		reqs = []
