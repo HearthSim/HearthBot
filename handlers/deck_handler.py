@@ -43,7 +43,7 @@ class DeckHandler():
 
 		output = ""
 		output += f"\n###"
-		output += f"\n# Class: {hero}"
+		output += f"\n# Hero: {hero}"
 		output += f"\n# Format: {list(FormatType)[(deck.format)].name}"
 		output += f"\n#"
 		for card in deck.cards:
