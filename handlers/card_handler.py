@@ -152,4 +152,7 @@ class CardHandler():
 		return ", ".join(reqs)
 
 	def get_ents(self, card):
-		return ", ".join([ent for ent in card.entourage])
+		return (
+			"Entourage: [%s]" 
+			% (", ".join([ent for ent in card.entourage]))
+		)
