@@ -38,7 +38,7 @@ def main():
 			discord_ids = [account_data["discord_id"] for account_data in accounts]
 			server_id = config["sync_roles"]["server_id"]
 
-			server = client.get_server(str(server_id))
+			server = client.get_guild(str(server_id))
 			if server is None:
 				raise RuntimeError("Could not find server %r" % (server_id))
 
@@ -56,11 +56,11 @@ def main():
 				if member.id in discord_ids:
 					if role_to_sync not in member_roles:
 						print("Adding role to %r" % (member))
-						await client.add_roles(member, role_to_sync)
+						await member.add_roles(role_to_sync)
 				else:
 					if role_to_sync in member_roles:
 						print("Removing role from %r" % (member))
-						await client.remove_roles(member, role_to_sync)
+						await member.remove_roles(role_to_sync)
 
 			print("Done")
 			await client.logout()
