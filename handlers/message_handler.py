@@ -5,16 +5,18 @@ import discord
 from datetime import datetime
 
 from .card_handler import CardHandler
+from .deck_handler import DeckHandler
 from .enum_handler import EnumHandler
 from .issue_handler import IssueHandler
 
 
-__version__ = "1.0.1"
+__version__ = "1.0.2"
 
 
 CMD_CARD = "!card "
 CMD_CARD_COLLECTIBLE = "!cardc "
 CMD_CARD_NONCOLLECTIBLE = "!cardn "
+CMD_DECK = "!deck "
 CMD_HELP = "!help"
 CMD_TAG = "!tag "
 CMD_ENUM = "!enum "
@@ -35,6 +37,7 @@ Extra arguments (advanced):
 * `!card "Charge" --lang=frFR` -> Output the results in French.
 * `!card "Charge" --reqs` -> List the Play Requirements for the card.
 * `!card "Charge" --tags` -> List the GameTags for the card.
+* `!card "Charge" --ents` -> List the Entourage for the card.
 
 Made with love by HearthSim.
 * Support and discussion: https://discord.gg/hearthsim
@@ -60,6 +63,7 @@ class MessageHandler:
 		self.client = client
 		self.issue_handler = IssueHandler(config["repos"])
 		self.card_handler = CardHandler()
+		self.deck_handler = DeckHandler()
 		self.enum_handler = EnumHandler(config)
 		self.max_cards_public = int(config["max_cards_public"])
 		self.max_cards_private = int(config["max_cards_private"])
@@ -90,6 +94,10 @@ class MessageHandler:
 
 		if message.content.startswith(CMD_CARD_NONCOLLECTIBLE):
 			await self.handle_card(message, CMD_CARD_NONCOLLECTIBLE, my_message, False)
+			return True
+
+		if message.content.startswith(CMD_DECK):
+			await self.handle_deck(message, CMD_DECK, my_message)
 			return True
 
 		if message.content.startswith(CMD_TAG):
@@ -136,6 +144,12 @@ class MessageHandler:
 	async def handle_card(self, message, cmd, my_message, collectible=None):
 		response = self.card_handler.handle(
 			message.content[len(cmd):], self.max_response(message), collectible
+		)
+		await self.respond(message, response, my_message)
+
+	async def handle_deck(self, message, cmd, my_message):
+		response = self.deck_handler.handle(
+			message.content[len(cmd):]
 		)
 		await self.respond(message, response, my_message)
 
