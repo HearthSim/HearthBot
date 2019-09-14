@@ -140,19 +140,28 @@ class CardHandler():
 		return card.collectible and card.type.name in ["MINION", "SPELL", "WEAPON"]
 
 	def get_tags(self, card):
-		return ", ".join("%s=%s" % (
+		tags = ", ".join("%s=%s" % (
 			getattr(key, "name", int(key)), card.tags[key]
 		) for key in card.tags.keys())
+		return (
+			"# Tags: [%s]"
+			% (tags)
+		)
 
 	def get_reqs(self, card):
-		reqs = []
+		reqs_list = []
 		for key in card.requirements.keys():
 			val = "=%s" % card.requirements[key] if card.requirements[key] else ""
-			reqs.append("%s%s" % (key.name, val))
-		return ", ".join(reqs)
+			reqs_list.append("%s%s" % (key.name, val))
+		reqs = ", ".join(reqs_list)
+		return (
+			"# Requirements: [%s]"
+			% (reqs)
+		)
 
 	def get_ents(self, card):
+		ents = ", ".join([ent for ent in card.entourage])
 		return (
-			"Entourage: [%s]" 
-			% (", ".join([ent for ent in card.entourage]))
+			"# Entourage: [%s]" 
+			% (ents)
 		)
