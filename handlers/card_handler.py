@@ -102,11 +102,14 @@ class CardHandler():
 		locale = card.locale
 		tags = ""
 		reqs = ""
+		ents = ""
 		if params:
 			if params.get("tags", False):
 				tags = "\n%s" % self.get_tags(card)
 			if params.get("reqs", False):
 				reqs = "\n%s" % self.get_reqs(card)
+			if params.get("ents", False) or params.get("entourage", False):
+				ents = "\n%s" % self.get_ents(card)
 			lang = params.get("lang", None)
 			if lang:
 				if len(lang) != 4:
@@ -129,8 +132,8 @@ class CardHandler():
 			url = ""
 
 		return (
-			"```Markdown\n[%s][%s][%s]%s%s%s%s%s```%s"
-			% (card.loc_name(locale), card.id, card.dbf_id, descr, text, flavor, tags, reqs, url)
+			"```Markdown\n[%s][%s][%s]%s%s%s%s%s%s```%s"
+			% (card.loc_name(locale), card.id, card.dbf_id, descr, text, flavor, tags, reqs, ents, url)
 		)
 
 	def has_link(self, card):
@@ -147,3 +150,9 @@ class CardHandler():
 			val = "=%s" % card.requirements[key] if card.requirements[key] else ""
 			reqs.append("%s%s" % (key.name, val))
 		return ", ".join(reqs)
+
+	def get_ents(self, card):
+		return (
+			"Entourage: [%s]" 
+			% (", ".join([ent for ent in card.entourage]))
+		)
