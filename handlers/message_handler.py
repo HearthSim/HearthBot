@@ -1,6 +1,7 @@
 import asyncio
 import re
 import sys
+import discord
 from datetime import datetime
 
 from .card_handler import CardHandler
@@ -49,7 +50,7 @@ PLUGINS_URL = "https://github.com/HearthSim/Hearthstone-Deck-Tracker/wiki/Availa
 def log_message(message):
 	timestamp = datetime.now().isoformat()
 	sys.stdout.write("[%s] [%s] [%s] [%s] %s\n" % (
-		timestamp, message.server, message.channel, message.author, message.content)
+		timestamp, message.guild, message.channel, message.author, message.content)
 	)
 	sys.stdout.flush()
 
@@ -76,7 +77,7 @@ class MessageHandler:
 			issue = match[1]
 			response = self.issue_handler.handle(message.channel.name, prefix, issue)
 			if response is not None:
-				await self.client.send_message(message.channel, response)
+				await message.channel.send(response)
 
 	async def handle_cmd(self, message, my_message=None):
 		if message.content.startswith(CMD_CARD):
@@ -106,13 +107,13 @@ class MessageHandler:
 			return True
 
 		if message.content.startswith(CMD_HELP):
-			if message.channel.is_private:
+			if isinstance(message.channel, discord.abc.PrivateChannel):
 				await self.respond(message, USAGE)
 			else:
 				await self.respond(message, "PM me !help for available commands. <3")
 			return True
 
-		if message.channel.is_private:
+		if isinstance(message.channel, discord.abc.PrivateChannel):
 			if message.content.startswith(CMD_INVITE):
 				if self.invite_url:
 					await self.respond(message, self.invite_url)
@@ -127,7 +128,7 @@ class MessageHandler:
 	async def respond(self, message, response, my_message=None):
 		log_message(message)
 		if my_message is None:
-			my_message = await self.client.send_message(message.channel, response)
+			my_message = await message.channel.send(response)
 		else:
 			await self.client.edit_message(my_message, response)
 		await self.check_edit(message, my_message)
@@ -147,4 +148,4 @@ class MessageHandler:
 			await asyncio.sleep(1)
 
 	def max_response(self, message):
-		return self.max_cards_private if message.channel.is_private else self.max_cards_public
+		return self.max_cards_private if isinstance(message.channel, discord.abc.PrivateChannel) else self.max_cards_public
