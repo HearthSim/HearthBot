@@ -138,7 +138,7 @@ class MessageHandler:
 		if my_message is None:
 			my_message = await message.channel.send(response)
 		else:
-			await self.client.edit_message(my_message, response)
+			await my_message.edit(content=response)
 		await self.check_edit(message, my_message)
 
 	async def handle_card(self, message, cmd, my_message, collectible=None):
