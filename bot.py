@@ -26,41 +26,47 @@ def main():
 		print("Logged in as", client.user.name)
 
 		if sync_roles:
-			p = subprocess.Popen(
-				config["sync_roles"]["command"],
-				stdin=subprocess.PIPE, stdout=subprocess.PIPE, stderr=subprocess.PIPE
-			)
-			output, stderr = p.communicate()
-			if stderr and b"psycopg2-binary" not in stderr:
-				# ignore psycopg2-binary warning (sigh)
-				raise RuntimeError("Error while running command: %r" % (stderr))
-			accounts = json.loads(output.decode("utf-8"))
-			discord_ids = [account_data["discord_id"] for account_data in accounts]
-			server_id = config["sync_roles"]["server_id"]
+			items = config["sync_roles"]
+			if not isinstance(items, list):
+				items = [items]
 
-			server = client.get_guild(server_id)
-			if server is None:
-				raise RuntimeError("Could not find server %r" % (server_id))
+			for item in items:
+				p = subprocess.Popen(
+					item["command"],
+					stdin=subprocess.PIPE, stdout=subprocess.PIPE, stderr=subprocess.PIPE
+				)
+				output, stderr = p.communicate()
+				if stderr and b"psycopg2-binary" not in stderr:
+					# ignore psycopg2-binary warning (sigh)
+					raise RuntimeError("Error while running command: %r" % (stderr))
+				accounts = json.loads(output.decode("utf-8"))
 
-			role_name = config["sync_roles"]["role"]
-			role_to_sync = None
-			for role in server.roles:
-				if role.name == role_name:
-					role_to_sync = role
-					break
-			else:
-				raise ValueError("Role %r not found on server %r" % (role_name, server))
+				discord_ids = [account_data["discord_id"] for account_data in accounts]
+				server_id = item["server_id"]
 
-			for member in server.members:
-				member_roles = list(member.roles)
-				if str(member.id) in discord_ids:
-					if role_to_sync not in member_roles:
-						print("Adding role to %r" % (member))
-						await member.add_roles(role_to_sync)
+				server = client.get_guild(server_id)
+				if server is None:
+					raise RuntimeError("Could not find server %r" % (server_id))
+
+				role_name = item["role"]
+				role_to_sync = None
+				for role in server.roles:
+					if role.name == role_name:
+						role_to_sync = role
+						break
 				else:
-					if role_to_sync in member_roles:
-						print("Removing role from %r" % (member))
-						await member.remove_roles(role_to_sync)
+					raise ValueError("Role %r not found on server %r" % (role_name, server))
+
+				for member in server.members:
+					member_roles = list(member.roles)
+					if str(member.id) in discord_ids:
+						if role_to_sync not in member_roles:
+							print("Adding role to %r" % (member))
+							await member.add_roles(role_to_sync)
+					else:
+						if role_to_sync in member_roles:
+							print("Removing role from %r" % (member))
+							await member.remove_roles(role_to_sync)
 
 			print("Done")
 			await client.logout()
