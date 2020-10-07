@@ -18,7 +18,8 @@ def main():
 	with open(args.config, "r") as f:
 		config = json.load(f)
 
-	client = discord.Client()
+	activity = discord.CustomActivity("DM me !help or !invite")
+	client = discord.Client(activity=activity)
 	message_handler = MessageHandler(config, client)
 
 	@client.event
