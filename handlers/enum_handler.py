@@ -82,7 +82,7 @@ class EnumHandler:
 			class_name = enum_class[0].lower()
 			if class_name in target_name or target_name in class_name:
 				suggestions.append(enum_class[0])
-		response = "Invalid enum name."
+		response = "Unknown enum."
 		if suggestions:
 			response += " Try " + pretty_list(suggestions)
 
