@@ -27,6 +27,8 @@ def main():
 		print("Logged in as", client.user.name)
 
 		if sync_roles:
+			print("Will sync roles, then disconnect")
+
 			items = config["sync_roles"]
 			if not isinstance(items, list):
 				items = [items]
@@ -44,6 +46,7 @@ def main():
 
 				discord_ids = [account_data["discord_id"] for account_data in accounts]
 				server_id = item["server_id"]
+				print("Found %d users to sync" % (len(discord_ids)))
 
 				server = client.get_guild(server_id)
 				if server is None:
