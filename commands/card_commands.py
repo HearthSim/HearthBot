@@ -1,9 +1,9 @@
 import re
 from enum import Enum, IntEnum
-from typing import Optional
+from typing import Any, Optional
 
 import discord
-from discord import app_commands
+from discord import ActionRow, ButtonStyle, app_commands
 from hearthstone import cardxml
 from hearthstone.cardxml import CardXML
 from hearthstone.enums import CardType, GameTag, Locale, Race, Rarity
@@ -54,6 +54,52 @@ CardXML.loc_text = loc_text
 CardXML.loc_flavor = loc_flavor
 
 
+class PaginationUI(discord.ui.View):
+	def __init__(self, get_prev_page: Optional[Any], get_next_page: Optional[Any]):
+		self.get_prev_page = get_prev_page
+		self.get_next_page = get_next_page
+		super().__init__()
+		self.init_page_buttons()
+
+	def init_page_buttons(self):
+		prev_page = discord.ui.Button(
+			label="Previous Page",
+			style=discord.ButtonStyle.grey,
+			disabled=self.get_prev_page is None,
+		)
+		prev_page.callback = self.prev_page
+
+		next_page = discord.ui.Button(
+			label="Next Page",
+			style=discord.ButtonStyle.grey,
+			disabled=self.get_next_page is None,
+		)
+		next_page.callback = self.next_page
+
+		self.add_item(prev_page)
+		self.add_item(next_page)
+
+	async def prev_page(self, interaction: discord.Interaction):
+		if self.get_prev_page is None:
+			return
+		content, view = self.get_prev_page()
+		await interaction.response.edit_message(
+			content=content,
+			view=view,
+		)
+		self.stop()
+
+	async def next_page(self, interaction: discord.Interaction):
+		if self.get_next_page is None:
+			return
+		content, view = self.get_next_page()
+		await interaction.response.edit_message(
+			content=content,
+			view=view,
+		)
+		self.stop()
+
+
 class CardCommands:
 	def __init__(self, max_responses_public: int, max_responses_private: int):
 		self.max_responses_public = max_responses_public
@@ -87,7 +133,7 @@ class CardCommands:
 				)
 
 			try:
-				response = self.do_card_search(
+				response, view = self.do_card_search(
 					search_text,
 					self.max_responses_public,
 					locale=Locale(locale.value),
@@ -97,7 +143,8 @@ class CardCommands:
 					collectible=collectible.collectible,
 				)
 				await interaction.response.send_message(
-					response,
+					content=response,
+					view=view
 				)
 			except CardNotFound:
 				await interaction.response.send_message(
@@ -119,8 +166,9 @@ class CardCommands:
 		requirements: bool,
 		entourage: bool,
 		collectible: Optional[bool],
+		page: Optional[int] = 1,
 	):
-		term = term.lower()
+		lterm = term.lower()
 		params = {
 			"tags": tags,
 			"requirements": requirements,
@@ -128,21 +176,15 @@ class CardCommands:
 			"lang": str(locale.name),
 		}
 
-		if term in self.db:
-			card = self.db[term]
+		if lterm in self.db:
+			card = self.db[lterm]
 			if card is not None:
-				return self.stringify_card(card, include_url=True, params=params)
+				return self.stringify_card(card, include_url=True, params=params), None
 
 		try:
-			page = 1
-			match = re.match(r"^(.+?)\s+(\d+)$", term)
-			if match is not None:
-				term = match.group(1).strip()
-				page = max(1, int(match.group(2)))
-
 			term_num = None
 			try:
-				term_num = int(term)
+				term_num = int(lterm)
 			except Exception:
 				pass
 			cards = []
@@ -150,7 +192,7 @@ class CardCommands:
 				if collectible is None or collectible == card.collectible:
 					card_name = card.name.lower()
 					if (
-						term_num is None and (term == ("\"%s\"" % card_name) or term in card_name) or
+						term_num is None and (lterm == ("\"%s\"" % card_name) or lterm in card_name) or
 						term_num is not None and term_num == card.dbf_id
 					):
 						cards.append(card)
@@ -158,23 +200,47 @@ class CardCommands:
 			if num_cards == 0:
 				raise CardNotFound
 			if num_cards == 1:
-				return self.stringify_card(cards[0], True, params)
+				return self.stringify_card(cards[0], True, params), None
 
 			page_size = min(max_response, num_cards)
 			page_count = int(num_cards / page_size)
-			page_index_hint = (
-				" - What are you trying to do here?! It clearly says %d!" % (page_count)
-			) if page > page_count else ""
-			page = min(page, page_count)
+			page = max(min(page, page_count), 1)
 			offset = max(0, (page - 1) * page_size)
-			next_page_hint = " - append '2' to see the second page." if not offset else ""
-			hint = (
-				"```Page %d/%d%s```" % (page, page_count, next_page_hint or page_index_hint)
-			) if page_count > 1 else ""
-			return hint + "".join(
+			hint = f"```Page {page}/{page_count}```" if page_count > 1 else ""
+
+			has_next_page = page < page_count
+			def get_next_page():
+				return self.do_card_search(
+					term=term,
+					max_response=max_response,
+					locale=locale,
+					tags=tags,
+					requirements=requirements,
+					entourage=entourage,
+					collectible=collectible,
+					page=page + 1,
+				)
+
+			has_prev_page = page > 1
+			def get_prev_page():
+				return self.do_card_search(
+					term=term,
+					max_response=max_response,
+					locale=locale,
+					tags=tags,
+					requirements=requirements,
+					entourage=entourage,
+					collectible=collectible,
+					page=page - 1,
+				)
+
+			return "".join(
 				self.stringify_card(cards[i], False, params)
 				for i in range(offset, min(offset + page_size, num_cards))
-			)
+			) + hint, PaginationUI(
+				get_next_page=get_next_page if has_next_page else None,
+				get_prev_page=get_prev_page if has_prev_page else None,
+			) if has_next_page or has_prev_page else None
 		except Exception as e:
 			print(e)
 		raise CardNotFound
