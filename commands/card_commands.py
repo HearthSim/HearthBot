@@ -125,9 +125,11 @@ class CardCommands:
 			entourage: bool = False,
 			collectible: CollectibleFilter = None,
 		):
-			if collectible is None:
+			if collectible is not None:
+				_collectible = collectible
+			else:
 				# Default to all collectibles if clearly a dbf id or a card id
-				collectible = (
+				_collectible = (
 					CollectibleFilter.ALL if re.match(r"^\d+$", search_text) or "_" in search_text
 					else CollectibleFilter.COLLECTIBLE_ONLY
 				)
@@ -140,17 +142,38 @@ class CardCommands:
 					tags=tags,
 					requirements=requirements,
 					entourage=entourage,
-					collectible=collectible.collectible,
+					collectible=_collectible.collectible,
 				)
 				await interaction.response.send_message(
 					content=response,
 					view=view
 				)
 			except CardNotFound:
-				await interaction.response.send_message(
-					"Card Not Found",
-					ephemeral=True,
-				)
+				if collectible is None and _collectible != CollectibleFilter.ALL:
+					try:
+						response, view = self.do_card_search(
+							search_text,
+							self.max_responses_public,
+							locale=Locale(locale.value),
+							tags=tags,
+							requirements=requirements,
+							entourage=entourage,
+							collectible=CollectibleFilter.ALL.collectible,
+						)
+						await interaction.response.send_message(
+							content=response,
+							view=view
+						)
+					except CardNotFound:
+						await interaction.response.send_message(
+							"Card not found",
+							ephemeral=True,
+						)
+				else:
+					await interaction.response.send_message(
+						"Card not found",
+						ephemeral=True,
+					)
 			except LanguageNotFound:
 				await interaction.response.send_message(
 					"Language not found. Supported language keys are e.g. `enUS` or `deDE`",
@@ -168,7 +191,7 @@ class CardCommands:
 		collectible: Optional[bool],
 		page: Optional[int] = 1,
 	):
-		lterm = term.lower()
+		lterm = term.strip().lower()
 		params = {
 			"tags": tags,
 			"requirements": requirements,
