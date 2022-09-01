@@ -1,6 +1,6 @@
 import re
 from enum import Enum, IntEnum
-from typing import Any, Optional
+from typing import Any, Optional, Tuple
 
 import discord
 from discord import ActionRow, ButtonStyle, app_commands
@@ -190,7 +190,7 @@ class CardCommands:
 		entourage: bool,
 		collectible: Optional[bool],
 		page: Optional[int] = 1,
-	):
+	) -> Tuple[str, Optional[discord.ui.View]]:
 		lterm = term.strip().lower()
 		params = {
 			"tags": tags,
