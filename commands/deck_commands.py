@@ -1,7 +1,7 @@
 from enum import IntEnum
 
 import discord
-from discord import app_commands
+from discord import AllowedMentions, app_commands
 from hearthstone import cardxml
 from hearthstone.cardxml import CardXML
 from hearthstone.deckstrings import Deck
@@ -70,7 +70,10 @@ class DeckCommands:
 			output += f"\n# To use this deck, copy it to your clipboard and create a new deck in Hearthstone"
 			output += "```"
 
-			await interaction.response.send_message(output)
+			await interaction.response.send_message(
+				output,
+				allowed_mentions=AllowedMentions.none(),
+			)
 
 	def find_card_name(self, card_id):
 		if card_id in self.db:

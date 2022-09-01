@@ -3,7 +3,7 @@ from enum import Enum, IntEnum
 from typing import Any, Optional, Tuple
 
 import discord
-from discord import ActionRow, ButtonStyle, app_commands
+from discord import ActionRow, AllowedMentions, ButtonStyle, app_commands
 from hearthstone import cardxml
 from hearthstone.cardxml import CardXML
 from hearthstone.enums import CardType, GameTag, Locale, Race, Rarity
@@ -146,7 +146,8 @@ class CardCommands:
 				)
 				await interaction.response.send_message(
 					content=response,
-					view=view
+					view=view,
+					allowed_mentions=AllowedMentions.none(),
 				)
 			except CardNotFound:
 				if collectible is None and _collectible != CollectibleFilter.ALL:
@@ -162,7 +163,8 @@ class CardCommands:
 						)
 						await interaction.response.send_message(
 							content=response,
-							view=view
+							view=view,
+							allowed_mentions=AllowedMentions.none(),
 						)
 					except CardNotFound:
 						await interaction.response.send_message(

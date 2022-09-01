@@ -3,7 +3,7 @@ import re
 from typing import List, Optional
 
 import discord
-from discord import app_commands
+from discord import AllowedMentions, app_commands
 from hearthstone import enums
 
 
@@ -47,7 +47,10 @@ class EnumCommands:
 
 			try:
 				response = self.handle_enum(enum, member, max_responses)
-				await interaction.response.send_message(response)
+				await interaction.response.send_message(
+					response,
+					allowed_mentions=AllowedMentions.none(),
+				)
 			except CommandError as err:
 				await interaction.response.send_message(
 					str(err),
