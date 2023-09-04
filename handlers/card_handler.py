@@ -123,7 +123,10 @@ class CardHandler():
 		stats = " %s/%s" % (card.atk, health) if card.atk + health > 0 else ""
 		race = " (%s)" % (card.race.name.title()) if card.race != Race.INVALID else ""
 		rarity = " %s" % card.rarity.name.title() if card.rarity != Rarity.INVALID else ""
-		descr = "\n[%s Mana,%s%s %s%s]" % (card.cost, stats, rarity, card.type.name.title(), race)
+		if card.tags.get(GameTag.IS_BACON_POOL_MINION, False) and card.tags.get(GameTag.TECH_LEVEL, 0):
+			descr = "\n[Tier %s,%s%s %s%s]" % (card.tags.get(GameTag.TECH_LEVEL), stats, rarity, card.type.name.title(), race)
+		else:
+			descr = "\n[%s Mana,%s%s %s%s]" % (card.cost, stats, rarity, card.type.name.title(), race)
 		text = "\n" + card.loc_text(locale) if len(card.description) else ""
 		flavor = "\n> " + card.loc_flavor(locale) if len(card.flavortext) else ""
 		if include_url and self.has_link(card):
