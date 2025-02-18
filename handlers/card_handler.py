@@ -140,7 +140,7 @@ class CardHandler():
 		)
 
 	def has_link(self, card):
-		return card.collectible and card.type.name in ["MINION", "SPELL", "WEAPON"]
+		return card.collectible and card.type.name in ["MINION", "SPELL", "WEAPON", "LOCATION"]
 
 	def get_tags(self, card):
 		tags = ", ".join("%s=%s" % (
